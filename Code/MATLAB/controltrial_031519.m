@@ -58,7 +58,7 @@ for th = 1:length(timehorz)         % sweep time horizon
                 % desired temperature
                 ydes = 20; % was 20ºC
                 
-                % CHANGE TO INPUTS!
+                % UPDATE DURING CONTROL TRIAL!
                 yobs0 = 21.54:-.01:20.54; % slowly observing a temperature increase
                 yobs = yobs0(1:timeahead+1);
                 dobs0 = [0	0	21.9	41.2	540.8	0	222	0	19.53	21.48	22.42	21.82	21.82];
@@ -122,80 +122,38 @@ for th = 1:length(timehorz)         % sweep time horizon
                 sole = value(eobs);
                 solc = value(cost)
                 
-                % when sweeping over parameter estimation method, training set, time horizon, etc....
+%                 % when sweeping over parameter estimation method, training set, time horizon, etc....
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).solu = value(u);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).soly = value(y);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).solx = value(x);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).sole = value(eobs);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).solc = value(cost);
-%                 
-%                 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319/Controltrial_031519_atrain'
-%                 figure;
-%                 % x axis build
-%                 plotx = zeros(1,timeahead*2 + 2); % +2 for starting and end points
-%                 ploty = zeros(1,timeahead*2 + 2);
-%                 addedx = zeros(1);
-%                 addedy = zeros(1,2);
-%                 for r = 1:timeahead
-%                     addx = repmat(r,1,2);
-%                     addy = repmat(solu(r),1,2);
-%                     addedx = horzcat(addedx, addx);
-%                     addedy = horzcat(addedy, addy);
-%                 end
-%                 addx = timeahead+1;
-%                 plotx = horzcat(addedx,addx);
-%                 ploty = addedy;
-%                 plot(plotx', ploty'); hold on; %... [0,0, solu(1),solu(1),solu(2),solu(2),solu(3),solu(3),... solu(4),solu(4),solu(5),solu(5)]
-%                 plot(0:timeahead+1, [yobs(1), soly])
-%                 xlabel('Minutes')
-%                 ylabel('Temp ºC and % Open')
-%                 legend('PositR (% open)','MPC-predicted roomC','Location','Northwest')
-%                 ax = gca;
-%                 ax.FontSize = 12;
-%                 filesave = strcat(['controlsim_031519_',pem{pm},'_',tset{ts},'_',order{od},'_',num2str(timeahead),'min_trial',num2str(trialnum),'.png'])
-%                 saveas(gcf,filesave)
-%                 
-%                 % with state space model alone (but using this control feedback...)
-%                 % have a no-control (NC) and a with control state-space estimation
-%                 states = zeros(ord,timeahead+1);
-%                 states_nc = zeros(ord,timeahead+1);
-%                 states(:,1) = xobs0;
-%                 states_nc(:,1) = xobs0;
-%                 roomtemp = zeros(1,timeahead+1);
-%                 roomtemp_nc = zeros(1,timeahead+1);
-%                 roomtemp(1) = C*states(:,1);
-%                 roomtemp_nc(1) = C*states_nc(:,1);
-%                 eobs = zeros(1,timeahead+1);
-%                 eobs(1) = yobs(1)-roomtemp(1);
-%                 for k = 2:timeahead+1
-%                     % with control
-%                     states(:,k) = A*states(:,k-1) + Bctrl*solu(k-1) + F*dobs0' + K*sole(k-1);
-%                     % without control
-% %                     states_nc(:,k) = A*states_nc(:,k) + B*[0,dobs0]' + K*eobs(k-1);
-%                     
-%                     roomtemp(k) = C*states(:,k) + sole(k);
-% %                     roomtemp_nc(k) = C*states_nc(:,k) + eobs(k); % SHOULD BE STATES_NC!!!
-% %                     eobs(k) = roomtemp_nc(k) - yobs(k); % but is this y the room temp changing due to control or no control?
-%                 end
-%                 
-%                 % NEED CLARITY ON WHAT I'M TRYING TO SHOW USING STATE-SPACE NO CONTROL
-%                 % BASELINE.. BECAUSE IT'S NOT THE LAB ITSELF...
-%                 
-%                 % CAN HAVE A FIGURE THAT SHOWS MODEL VS> ROOM BUT NOT MODEL VS MPC (BC
-%                 % MPC USES MODEL)
-%                 
-%                 figure;
-%                 plot(plotx', ploty'); hold on;
-%                 plot(0:timeahead+1, [yobs(1), soly])
-%                 plot(0:timeahead+1, [yobs(1),roomtemp],'o');
-%                 plot(0:timeahead+1, [yobs(1),roomtemp_nc],'o');
-%                 xlabel('Minutes')
-%                 ylabel('Temp ºC and % Open')
-%                 legend('PositR (% open)','MPC-predicted roomC','Model simulated control','Model simulated NO control','Location','Northwest')
-%                 ax = gca;
-%                 ax.FontSize = 12;
-%                 filesave = strcat(['controlsim_031519_',pem{pm},'_',tset{ts},'_',order{od},'_',num2str(timeahead),'min_modsim_trial',num2str(trialnum),'.png'])
-%                 saveas(gcf,filesave)
+                
+                cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319/Controltrial_031519_atrain'
+                figure;
+                % x axis build
+                plotx = zeros(1,timeahead*2 + 2); % +2 for starting and end points
+                ploty = zeros(1,timeahead*2 + 2);
+                addedx = zeros(1);
+                addedy = zeros(1,2);
+                for r = 1:timeahead
+                    addx = repmat(r,1,2);
+                    addy = repmat(solu(r),1,2);
+                    addedx = horzcat(addedx, addx);
+                    addedy = horzcat(addedy, addy);
+                end
+                addx = timeahead+1;
+                plotx = horzcat(addedx,addx);
+                ploty = addedy;
+                plot(plotx', ploty'); hold on; %... [0,0, solu(1),solu(1),solu(2),solu(2),solu(3),solu(3),... solu(4),solu(4),solu(5),solu(5)]
+                plot(0:timeahead+1, [yobs(1), soly])
+                xlabel('Minutes')
+                ylabel('Temp ºC and % Open')
+                legend('PositR (% open)','MPC-predicted roomC','Location','Northwest')
+                ax = gca;
+                ax.FontSize = 12;
+                filesave = strcat(['controlsim_031519_',pem{pm},'_',tset{ts},'_',order{od},'_',num2str(timeahead),'min_trial',num2str(trialnum),'.png'])
+                saveas(gcf,filesave)
                 
             end
 %             close all;
@@ -203,4 +161,5 @@ for th = 1:length(timehorz)         % sweep time horizon
     end
 end
 
+% print out solution (% opening of roof skylight window) for implementation by minute
 solu
