@@ -122,6 +122,7 @@ for th = 1:length(timehorz)         % sweep time horizon
                 sole = value(eobs);
                 solc = value(cost)
                 
+                % when sweeping over parameter estimation method, training set, time horizon, etc....
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).solu = value(u);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).soly = value(y);
 %                 OPT.(pem{pm}).(tset{ts}).(order{od}).(timehorizon).solx = value(x);
@@ -203,7 +204,3 @@ for th = 1:length(timehorz)         % sweep time horizon
 end
 
 solu
-    
-    % now we know it's a model problem
-        % wasn't including K*e(t) where e(t) is observed-predicted roomC
-    
