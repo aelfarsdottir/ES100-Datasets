@@ -1,7 +1,9 @@
+%% AldÃ­s ElfarsdÃ³ttir
+% March 13, 2019 
+
 %% Consolidating model dev and prelim control scripts
-% March 13, 2019 testing with Yang Zheng that YALMIP, CVX working
-% Found that model needs to be redeveloped for more significant parameters
-% can I just test to see if more drastic A's and B's work?
+% Tested with Dr. Yang Zheng that YALMIP, CVX working
+
 %% start
 close all;
 clc;
@@ -54,7 +56,7 @@ for th = 1:length(timehorz)         % sweep time horizon
                 timehorizon = strcat('step',num2str(timehorz(th))); % indexing
                 
                 % desired temperature
-                ydes = 20; % was 20ºC
+                ydes = 20; % was 20ÂºC
                 
                 % CHANGE TO INPUTS!
                 yobs0 = 21.54:-.01:20.54; % slowly observing a temperature increase
@@ -145,7 +147,7 @@ for th = 1:length(timehorz)         % sweep time horizon
 %                 plot(plotx', ploty'); hold on; %... [0,0, solu(1),solu(1),solu(2),solu(2),solu(3),solu(3),... solu(4),solu(4),solu(5),solu(5)]
 %                 plot(0:timeahead+1, [yobs(1), soly])
 %                 xlabel('Minutes')
-%                 ylabel('Temp ºC and % Open')
+%                 ylabel('Temp ÂºC and % Open')
 %                 legend('PositR (% open)','MPC-predicted roomC','Location','Northwest')
 %                 ax = gca;
 %                 ax.FontSize = 12;
@@ -187,7 +189,7 @@ for th = 1:length(timehorz)         % sweep time horizon
 %                 plot(0:timeahead+1, [yobs(1),roomtemp],'o');
 %                 plot(0:timeahead+1, [yobs(1),roomtemp_nc],'o');
 %                 xlabel('Minutes')
-%                 ylabel('Temp ºC and % Open')
+%                 ylabel('Temp ÂºC and % Open')
 %                 legend('PositR (% open)','MPC-predicted roomC','Model simulated control','Model simulated NO control','Location','Northwest')
 %                 ax = gca;
 %                 ax.FontSize = 12;
