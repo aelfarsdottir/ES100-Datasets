@@ -10,8 +10,8 @@ clc;
 
 %% CONTROL MODEL
 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
-load workspace_031319_essentials.mat % shared via DROPBOX due to file size
-
+load workspace_031319_essentials.mat % shared via DRIVE due to file size
+% https://drive.google.com/open?id=1WQeSVsohE-RZ6Zgh-qnToohKr_5el82F
 
 % switch depending on control trial 
 pem = {'tn4sid'}; % t for training
