@@ -3,8 +3,8 @@
 The python code processes the sensor data into training and validation sets. 
 The MATLAB code then uses those training and validation sets to develop and evaluate models.
 
-## Preprocessed data
-Using the python code, individual sensor files were resampled, interpolated, filled, and concatenated to form these preprocessed sets for training and validation of models in MATLAB.
+## Data
+Raw data comprises the individual sensor files. Using the python code, individual sensor files were resampled, interpolated, filled, and concatenated to form these preprocessed sets for training and validation of models in MATLAB. Preprocessed sets comprise these training and validation sets.
 
 ##### DATASET4
 Dataset4 was used to develop second iteration models that were eventually used in MPC trials. The fullrow.csv file (50 Mb) is available via Google Drive, as well as the MATLAB workspace structures containing N4SID identified models, and tabulated results of fit to estimation and validation data.
