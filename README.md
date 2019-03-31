@@ -1,9 +1,8 @@
 ## Code
 
-The python code processes the sensor data into training and validation sets. 
-The MATLAB code then uses those training and validation sets to develop and evaluate models.
+The Python code processes the sensor data into training and validation sets. The MATLAB code then uses those training and validation sets to develop and evaluate models.
 
-## Data
+## Raw and Preprocessed Data
 Raw data comprises the individual sensor files. Using the python code, individual sensor files were resampled, interpolated, filled, and concatenated to form these preprocessed sets for training and validation of models in MATLAB. Preprocessed sets comprise these training and validation sets.
 
 ##### DATASET4
