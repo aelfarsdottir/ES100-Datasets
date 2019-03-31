@@ -31,7 +31,6 @@ uvar = {'positR','positS','heatvalve','slabC','humid','co2','occ', ...
 cellnames = fieldnames(structset);
 
 %% MAKE IDDATA OBJECT FOR SYSTEM IDENTIFICATION USING N4SID
-cellnames = fieldnames(structset); %{'atrain'}; %fieldnames(structset);
 
 for cn = 1 : length(cellnames) % atrain, avalid, btrain, bvalid, before, after, fullrow
     
@@ -57,8 +56,6 @@ end
 
 %% RUN N4SID ON IDDATA OBJECT
 
-cellnames = fieldnames(FULL); %{'train1'}; %fieldnames(structset);
-
 order = [1,2,3]; % model order
 
 for o = 1:length(order)
@@ -80,9 +77,8 @@ for o = 1:length(order)
 end
 
 %% COLLECT FIT TO VALIDATION DATA
-% 031819
 
-tset = {'train2','train3','train4'};
+tset = {'atrain','avalid','btrain','bvalid','fullrow'};
 pem = {'n4sid'};
 order = {'order1','order2','order3'};
 makefigures = 'no';
@@ -185,17 +181,18 @@ for pm = 1:length(pem)              % sweep parameter estimation method
 
             % extract column values to add to MODELDEVresults table
             rowname = vertcat(rowname,strcat(tset{ts},'-',pem{pm},'-',order{od}));
-            r2train2 = vertcat(r2train2,REFTABLE.train2);
-            r2train3 = vertcat(r2train3,REFTABLE.train3);
-            r2train4 = vertcat(r2train4,REFTABLE.train4);
-            
+            r2atrain = vertcat(r2atrain,REFTABLE.atrain);
+            r2avalid = vertcat(r2avalid,REFTABLE.avalid);
+            r2btrain = vertcat(r2btrain,REFTABLE.btrain);
+            r2bvalid = vertcat(r2bvalid,REFTABLE.bvalid);
+            r2after = vertcat(r2after,REFTABLE.after);
+            r2before = vertcat(r2before,REFTABLE.before);
+            r2fullrow = vertcat(r2fullrow,REFTABLE.fullrow);
         end
     end
 end
 
-MODELDEVresults.fitvalid = table(rowname, r2train2, r2train3, r2train4);
-% MODELDEVresults = sortrows(MODELDEVresults,'cost','ascend')
-
+MODELDEVresults.fitvalid = table(rowname, r2atrain, r2avalid, r2btrain, r2bvalid, r2after, r2before, r2fullrow);
 
 %% From given folder, import files and save as structure .mat 
 % only need to run this script once, and it saves all variables into .mat
@@ -231,5 +228,5 @@ end
 
 % SAVE AS MATFILE
 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
-save dataset4_021319_fullrow.mat full % for later imports
+save dataset4_021319_fullrow.mat full % for later imports (as at beginning of this script)
 end
