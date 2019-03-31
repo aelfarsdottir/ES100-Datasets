@@ -1,7 +1,7 @@
 %% Aldís Elfarsdóttir
 % March 13, 2019 
 
-%% Consolidating model dev and prelim control scripts
+%% Script for model predictive control trials with fullrow-2nd order and atrain-2nd order
 % Tested with Dr. Yang Zheng that YALMIP, CVX working
 
 %% start
