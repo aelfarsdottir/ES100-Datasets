@@ -9,8 +9,8 @@ clc;
 
 %% load structures of training and validation data
 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
-load dataset4_021319_fullrow.mat % shared via DROPBOX due to size
-load workspace022919_1030pm.mat % shared via DROPBOX due to size
+load workspace022919_1030pm.mat % shared via GOOGLE DRIVE due to size
+% https://drive.google.com/open?id=1WQeSVsohE-RZ6Zgh-qnToohKr_5el82F
 
 %% initialize switch variables
 structset = FULL;       % the structure containing training and validation data
