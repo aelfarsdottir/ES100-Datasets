@@ -7,28 +7,24 @@
 %% start
 close all;
 clc;
-cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
-load workspace_031319_essentials.mat
-
-%% TO DO
 
 %% CONTROL MODEL
 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
 load workspace_031319_essentials.mat % shared via DROPBOX due to file size
 
-pem = {'tn4sid'}; % t for training
 
 % switch depending on control trial 
+pem = {'tn4sid'}; % t for training
 tset = {'atrain'}; % can sweep over {'after','atrain','avalid','before','btrain','bvalid','fullrow'};
 order = {'order2'}; % can sweep over {'order1','order2','order3'};
 timehorz = 10; % can sweep over [1,2,5,10,15]
 
 
-trialnum = 13;
-for th = 1:length(timehorz)         % sweep time horizon
-    for pm = 1:length(pem)              % sweep parameter estimation method
-        for ts = 1:length(tset)         % sweep training set
-            for od = 1:length(order)    % sweep order
+trialnum = 13;                          % UPDATE DURING CONTROL TRIAL
+for th = 1:length(timehorz)             % can sweep time horizon
+    for pm = 1:length(pem)              % can sweep parameter estimation method
+        for ts = 1:length(tset)         % can sweep training set
+            for od = 1:length(order)    % can sweep order
                 
                 % select model
                 ctrlmodel = MODEL.(pem{pm}).(tset{ts}).(order{od}); % can choose different model later
@@ -36,26 +32,27 @@ for th = 1:length(timehorz)         % sweep time horizon
                 
                 % coefficients
                 A = ctrlmodel.A;
-                B = ctrlmodel.B; % partitioned below
+                B = ctrlmodel.B;    % partitioned as follows:
                 ctrlnames = ctrlmodel.InputName(1); % controlling positR
-                Bctrl = B(:,1);  % positR
-                F = B(:,2:end);  % heatvalve, positS, slabC, humid, co2, occ, windir,
-                % rain, oatC, temp31, temp33, temp23, temp22
+                Bctrl = B(:,1);     % positR
+                F = B(:,2:end);     % heatvalve, positS, slabC, humid, co2, occ, windir,
+                                    % rain, oatC, temp31, temp33, temp23, temp22
                 C = ctrlmodel.C;
                 D = ctrlmodel.D;
                 K = ctrlmodel.K;
                 
                 % time horizon
-                timeahead = timehorz(th) % sweep
+                timeahead = timehorz(th) % can sweep
                 timehorizon = strcat('step',num2str(timehorz(th))); % indexing
                 
-                % desired temperature
-                ydes = 20; % was 20ºC
+                % desired temperature (setpoint)
+                ydes = 20; % was 17.5ºC during control trial to satisfy oatC < setC < roomC
                 
                 % UPDATE DURING CONTROL TRIAL!
-                yobs0 = 21.54:-.01:20.54; % slowly observing a temperature increase
+                yobs0 = 19.54:-.01:18.54; % make a guess for what the observed temperature will be. 
+                % ^^ this will use actual sensor data when implemented in real-time interface!            
                 yobs = yobs0(1:timeahead+1);
-                dobs0 = [0	0	21.9	41.2	540.8	0	222	0	19.53	21.48	22.42	21.82	21.82];
+                dobs0 = [0	0	21.9	41.2	540.8	0	222	0	19.53	21.48	22.42	21.82	21.82]; # UPDATE EACH TIME
                 
                 % switch order and state initiation
                 switch order{od}
@@ -64,14 +61,14 @@ for th = 1:length(timehorz)         % sweep time horizon
                         xobs0 = yobs(1)./C(1); % for now
                     case 'order2'
                         ord = 2;
-                        xobs0 = [yobs(1)./C(1); 0]; % yobs(1)./C(1) SWITCHING THIS REDUCED COST TO 7!! % essentially x(0) = y(0)/C
+                        xobs0 = [yobs(1)./C(1); 0]; % essentially x(0) = y(0)/C
                     case 'order3'
                         ord = 3;
-                        xobs0 = [yobs(1)./C(1);0;0]; % guessing for now
+                        xobs0 = [yobs(1)./C(1);0;0]; % for now
                 end
                 
                 
-                % Yalmip with Yang + Ke(t) and xinit on own
+                % YALMIP syntax with Yang, CVX syntax + Ke(t) and state-initialization on own
                 
                 % variables
                 u = sdpvar(1,timeahead);
@@ -85,6 +82,7 @@ for th = 1:length(timehorz)         % sweep time horizon
                 constr = [constr, y(1) == C*x(:,1)]; % not exactly equal to yobs(1)
                 constr = [constr, eobs(1) == yobs(1) - y(1)]; % initiate pred-error term
                 
+                % step forward prediction using the state-space model
                 for k = 2:timeahead+1
                     
                     % included K and error term (ypredicted - yobserved)
