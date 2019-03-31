@@ -12,22 +12,16 @@ load workspace_031319_essentials.mat
 
 %% TO DO
 
-% COEFFICIENTS = ??
-% SEE WHICH MODEL IS BEST AT CONTROLLING! (IN SIM AND IN LAB)
-% MODIFY SCRIPT TO TAKE USER INPUTS FOR OBSERVED DISTURBANCES AND
-% TEMPERATURES EACH MINUTE
-
 %% CONTROL MODEL
-% MODEL USED ON FEB 22: model.tssest.atrain.order2
 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319'
-load workspace_031319_essentials.mat
+load workspace_031319_essentials.mat % shared via DROPBOX due to file size
 
-pem = {'tn4sid'};
+pem = {'tn4sid'}; % t for training
 
-% switch depending on avalid (1st trial) atrain (2nd trial)
-tset = {'atrain'}; %{'after','atrain','avalid','before','btrain','bvalid','fullrow'};
-order = {'order2'}; %{'order1','order2','order3'};
-timehorz = 10; % [1,2,5,10,15]; % sweep % done with 1,2,5,
+% switch depending on control trial 
+tset = {'atrain'}; % can sweep over {'after','atrain','avalid','before','btrain','bvalid','fullrow'};
+order = {'order2'}; % can sweep over {'order1','order2','order3'};
+timehorz = 10; % can sweep over [1,2,5,10,15]
 
 
 trialnum = 13;
@@ -86,12 +80,9 @@ for th = 1:length(timehorz)         % sweep time horizon
                 eobs = sdpvar(1,timeahead+1);
                 
                 % constraints
-                constr = [];
-                constr = [constr, x(:,1) == xobs0];% + Bctrl*u(1)]; % + F*dobs0'];
+                constr = []; % initialize constraint vector
+                constr = [constr, x(:,1) == xobs0]; % + Bctrl*u(1)]; % + F*dobs0'];
                 constr = [constr, y(1) == C*x(:,1)]; % not exactly equal to yobs(1)
-                
-                % y-yobs --> 41 cost, yobs-y --> 271 cost! switching xobs0 "arbitrary 0
-                % assignment" reduced cost to ~7. yobs-y now gives slightly lower cost
                 constr = [constr, eobs(1) == yobs(1) - y(1)]; % initiate pred-error term
                 
                 for k = 2:timeahead+1
@@ -99,20 +90,21 @@ for th = 1:length(timehorz)         % sweep time horizon
                     % included K and error term (ypredicted - yobserved)
                     constr = [constr, x(:,k) == A*x(:,k-1) + Bctrl*u(k-1) + F*dobs0' + K*eobs(k-1)];
                     
+                    % response variable
                     constr = [constr, y(k) == C*x(:,k) + eobs(k)];
                     
-                    % new: add error term predicted minus measured (let measured be yobs(1:6))
-                    constr = [constr, eobs(k) == yobs(k) - y(k)]; % another way to enforce ydes?
+                    % definition of prediction error
+                    constr = [constr, eobs(k) == yobs(k) - y(k)];
                     
                 end
                 
-                constr = [constr, u <= 100*ones(1,timeahead), u >= zeros(1,timeahead)];
-                constr = [constr, y(end) == ydes];
+                constr = [constr, u <= 100*ones(1,timeahead), u >= zeros(1,timeahead)]; % realistic window opening
+                constr = [constr, y(end) == ydes]; % end constraint
                 
                 % cost function
-                cost = norm(y - ydes*ones(1,timeahead+1));
+                cost = norm(y - ydes*ones(1,timeahead+1)); % 2-norm of tracking error (roomC - setC)
                 
-                % call solvers
+                % call CVX solvers
                 optimize(constr,cost);
                 
                 % report results
@@ -131,8 +123,8 @@ for th = 1:length(timehorz)         % sweep time horizon
                 
                 cd '/Users/Aldis/Documents/MATLAB/ES100/Dataset4/Preprocessed/021319/Controltrial_031519_atrain'
                 figure;
-                % x axis build
-                plotx = zeros(1,timeahead*2 + 2); % +2 for starting and end points
+                % build plotting vectors
+                plotx = zeros(1,timeahead*2 + 2); % +2 for starting and end points to connect line segments of window position
                 ploty = zeros(1,timeahead*2 + 2);
                 addedx = zeros(1);
                 addedy = zeros(1,2);
@@ -152,11 +144,12 @@ for th = 1:length(timehorz)         % sweep time horizon
                 legend('PositR (% open)','MPC-predicted roomC','Location','Northwest')
                 ax = gca;
                 ax.FontSize = 12;
+                
+                % save new file for each segment of the control trial for later reference
                 filesave = strcat(['controlsim_031519_',pem{pm},'_',tset{ts},'_',order{od},'_',num2str(timeahead),'min_trial',num2str(trialnum),'.png'])
                 saveas(gcf,filesave)
                 
             end
-%             close all;
         end
     end
 end
